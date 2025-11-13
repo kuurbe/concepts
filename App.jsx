@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { MapPin, Users, AlertTriangle, TrendingUp, Shield, DollarSign, TrendingDown, Star, Calendar, XCircle, Music, Gamepad2, Utensils, Activity, Heart } from 'lucide-react';
 
 const App = () => {
