@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Navigation, Eye, Shield, Users, Car, Music, TrendingUp, Star, Calendar, AlertCircle, Flame, Coffee, Utensils, Building2, ShoppingBag } from 'lucide-react';
+import { MapPin, Navigation, Eye, Shield, Users, Car, Music, TrendingUp, Star, Calendar, AlertCircle, Flame, Coffee, Utensils, Building2, ShoppingBag, Heart, Share2, Bell, User, Sparkles, ThumbsUp, MessageCircle, Bookmark, Clock, Zap, Award, Target } from 'lucide-react';
 
 const App = () => {
   const [appState, setAppState] = useState('loader');
   const [loaderStep, setLoaderStep] = useState(0);
-  const [activeTab, setActiveTab] = useState('discover');
+  const [activeTab, setActiveTab] = useState('foryou');
   const [heatMode, setHeatMode] = useState('safety');
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [timeOfDay, setTimeOfDay] = useState('evening');
+  const [savedVenues, setSavedVenues] = useState([1, 4]);
+  const [userPreferences, setUserPreferences] = useState(['outdoor', 'food', 'nightlife']);
+  const [showQuickDecision, setShowQuickDecision] = useState(true);
+  const [streakDays, setStreakDays] = useState(7);
 
   useEffect(() => {
     if (appState === 'loader') {
@@ -23,56 +27,64 @@ const App = () => {
       address: '2012 Woodall Rodgers Fwy', neighborhood: 'Downtown',
       crowd: 68, parking: 52, vibe: 94, safety: 96, rating: 4.8,
       lat: 32.7890, lng: -96.8010, emoji: '🌳', distance: '0.2 mi',
-      hours: 'Open 24/7', popular: true, trending: true
+      hours: 'Open 24/7', popular: true, trending: true,
+      checkins: 234, likes: 890, tags: ['family-friendly', 'instagram-worthy', 'free']
     },
     { 
       id: 2, name: 'Pecan Lodge', type: 'BBQ Restaurant', category: 'food',
       address: '2702 Main St', neighborhood: 'Deep Ellum',
       crowd: 92, parking: 45, vibe: 91, safety: 88, rating: 4.7,
       lat: 32.7820, lng: -96.7850, emoji: '🍖', distance: '1.1 mi',
-      hours: '11 AM - 9 PM', popular: true, trending: false
+      hours: '11 AM - 9 PM', popular: true, trending: false,
+      checkins: 456, likes: 1240, tags: ['must-try', 'authentic', 'long-wait']
     },
     { 
       id: 3, name: 'Reunion Tower', type: 'Observation Deck', category: 'attraction',
       address: '300 Reunion Blvd E', neighborhood: 'Downtown',
       crowd: 42, parking: 81, vibe: 96, safety: 98, rating: 4.9,
       lat: 32.7755, lng: -96.8089, emoji: '🏙️', distance: '0.6 mi',
-      hours: '10 AM - 10 PM', popular: true, trending: false
+      hours: '10 AM - 10 PM', popular: true, trending: false,
+      checkins: 189, likes: 2100, tags: ['romantic', 'views', 'date-night']
     },
     { 
       id: 4, name: 'The Rustic', type: 'Live Music Venue', category: 'nightlife',
       address: '3656 Howell St', neighborhood: 'Uptown',
       crowd: 88, parking: 38, vibe: 97, safety: 85, rating: 4.6,
       lat: 32.8021, lng: -96.7989, emoji: '🎸', distance: '2.8 mi',
-      hours: '4 PM - 2 AM', popular: true, trending: true
+      hours: '4 PM - 2 AM', popular: true, trending: true,
+      checkins: 678, likes: 1560, tags: ['live-music', 'outdoor', 'energetic']
     },
     { 
       id: 5, name: 'Dallas Museum of Art', type: 'Museum', category: 'culture',
       address: '1717 N Harwood St', neighborhood: 'Arts District',
       crowd: 35, parking: 88, vibe: 89, safety: 97, rating: 4.8,
       lat: 32.7876, lng: -96.8010, emoji: '🎨', distance: '0.4 mi',
-      hours: '11 AM - 5 PM', popular: false, trending: false
+      hours: '11 AM - 5 PM', popular: false, trending: false,
+      checkins: 123, likes: 780, tags: ['cultural', 'quiet', 'educational']
     },
     { 
       id: 6, name: 'Bishop Arts District', type: 'Shopping District', category: 'shopping',
       address: 'N Bishop Ave', neighborhood: 'Oak Cliff',
       crowd: 73, parking: 56, vibe: 93, safety: 90, rating: 4.7,
       lat: 32.7490, lng: -96.8217, emoji: '🛍️', distance: '4.2 mi',
-      hours: '10 AM - 10 PM', popular: true, trending: true
+      hours: '10 AM - 10 PM', popular: true, trending: true,
+      checkins: 345, likes: 1120, tags: ['boutique', 'local', 'walkable']
     },
     { 
       id: 7, name: 'Deep Ellum Brewing', type: 'Brewery', category: 'nightlife',
       address: '2823 St Louis St', neighborhood: 'Deep Ellum',
       crowd: 81, parking: 62, vibe: 88, safety: 86, rating: 4.5,
       lat: 32.7839, lng: -96.7764, emoji: '🍺', distance: '1.4 mi',
-      hours: '12 PM - 11 PM', popular: false, trending: true
+      hours: '12 PM - 11 PM', popular: false, trending: true,
+      checkins: 289, likes: 934, tags: ['craft-beer', 'casual', 'groups']
     },
     { 
       id: 8, name: 'Sixty Vines', type: 'Wine Bar', category: 'food',
       address: '3701 McKinney Ave', neighborhood: 'Uptown',
       crowd: 65, parking: 71, vibe: 90, safety: 92, rating: 4.6,
       lat: 32.8039, lng: -96.7989, emoji: '🍷', distance: '2.9 mi',
-      hours: '11 AM - 11 PM', popular: false, trending: false
+      hours: '11 AM - 11 PM', popular: false, trending: false,
+      checkins: 167, likes: 645, tags: ['upscale', 'wine', 'date-night']
     }
   ];
 
@@ -80,17 +92,17 @@ const App = () => {
     {
       id: 1, name: 'Dallas Mavericks vs Lakers', venue: 'American Airlines Center',
       time: 'Tonight 7:30 PM', category: 'Sports', crowd: 98, safety: 93,
-      emoji: '🏀', address: '2500 Victory Ave'
+      emoji: '🏀', address: '2500 Victory Ave', attendees: '18.4K going'
     },
     {
       id: 2, name: 'Deep Ellum Art Walk', venue: 'Deep Ellum',
       time: 'Saturday 6:00 PM', category: 'Art', crowd: 75, safety: 89,
-      emoji: '🎨', address: 'Main St'
+      emoji: '🎨', address: 'Main St', attendees: '2.1K going'
     },
     {
       id: 3, name: 'Food Truck Rally', venue: 'Klyde Warren Park',
       time: 'Tomorrow 5:00 PM', category: 'Food', crowd: 82, safety: 95,
-      emoji: '🍔', address: '2012 Woodall Rodgers'
+      emoji: '🍔', address: '2012 Woodall Rodgers', attendees: '890 going'
     }
   ];
 
@@ -209,6 +221,265 @@ const App = () => {
       </div>
     );
   }
+
+  // QUICK DECISION CARD - Smart recommendation engine
+  const QuickDecisionCard = () => {
+    const recommendedVenue = venues.find(v => v.id === 1); // Smart logic would go here
+    
+    return (
+      <div className="relative mb-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-[2.5rem] blur-2xl opacity-30"></div>
+        <div className="relative bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-600 rounded-[2.5rem] p-6 shadow-2xl">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-yellow-300" />
+              <span className="text-sm font-bold text-white/90 uppercase tracking-wide">Perfect for you</span>
+            </div>
+            <button className="text-white/60 hover:text-white">
+              <Target className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center text-4xl">
+              {recommendedVenue.emoji}
+            </div>
+            <div className="flex-1">
+              <h3 className="text-2xl font-black text-white mb-1">{recommendedVenue.name}</h3>
+              <p className="text-white/80 text-sm">{recommendedVenue.distance} away • {recommendedVenue.neighborhood}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            <div className="bg-white/10 backdrop-blur-xl rounded-xl p-3 text-center">
+              <div className="text-2xl font-black text-white">{recommendedVenue.crowd}%</div>
+              <div className="text-xs text-white/70">Crowd</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-xl rounded-xl p-3 text-center">
+              <div className="text-2xl font-black text-emerald-300">{recommendedVenue.safety}%</div>
+              <div className="text-xs text-white/70">Safety</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-xl rounded-xl p-3 text-center">
+              <div className="text-2xl font-black text-white">{recommendedVenue.parking}%</div>
+              <div className="text-xs text-white/70">Parking</div>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <button className="flex-1 bg-white text-purple-600 font-bold py-4 rounded-xl hover:scale-[1.02] active:scale-95 transition-all shadow-lg">
+              Go Now
+            </button>
+            <button className="bg-white/20 backdrop-blur-xl text-white font-bold px-6 py-4 rounded-xl hover:bg-white/30 transition-all">
+              <Share2 className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between text-sm">
+            <span className="text-white/70">Why this? Based on your preferences</span>
+            <div className="flex gap-1">
+              {recommendedVenue.tags.slice(0, 2).map((tag, idx) => (
+                <span key={idx} className="bg-white/10 px-2 py-1 rounded-lg text-white/80 text-xs">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // FOR YOU TAB - Personalized feed
+  const ForYouView = () => {
+    const trending = venues.filter(v => v.trending);
+    const matchedVenues = venues.filter(v => userPreferences.includes(v.category));
+
+    return (
+      <div className="h-full overflow-y-auto pb-32" style={{ scrollBehavior: 'smooth' }}>
+        {/* Header with user stats */}
+        <div className="sticky top-0 z-10 bg-gradient-to-b from-white via-white to-transparent pb-4">
+          <div className="px-6 pt-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-4xl font-black text-gray-900 mb-1">For You</h1>
+                <p className="text-sm text-gray-600">Personalized recommendations</p>
+              </div>
+              <button className="relative">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center">
+                  <User className="w-6 h-6 text-white" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-rose-500 rounded-full border-2 border-white flex items-center justify-center">
+                  <span className="text-xs font-bold text-white">{streakDays}</span>
+                </div>
+              </button>
+            </div>
+
+            {/* Streak tracker */}
+            <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 mb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center">
+                    <Flame className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-white/90">Exploration Streak</div>
+                    <div className="text-2xl font-black text-white">{streakDays} days</div>
+                  </div>
+                </div>
+                <Award className="w-8 h-8 text-white/80" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6">
+          {/* Quick Decision Card */}
+          {showQuickDecision && <QuickDecisionCard />}
+
+          {/* Saved/Favorites */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
+                <Heart className="w-6 h-6 fill-rose-500 text-rose-500" />
+                Your Favorites
+              </h2>
+              <button className="text-sm font-bold text-purple-600">See all</button>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {venues.filter(v => savedVenues.includes(v.id)).map((venue) => (
+                <div
+                  key={venue.id}
+                  className="flex-shrink-0 w-48 bg-white rounded-2xl p-4 shadow-lg border border-gray-100"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-cyan-100 rounded-xl flex items-center justify-center text-3xl mb-3">
+                    {venue.emoji}
+                  </div>
+                  <h3 className="font-bold text-gray-900 text-sm mb-1 truncate">{venue.name}</h3>
+                  <p className="text-xs text-gray-500 mb-2">{venue.distance}</p>
+                  <div className="flex items-center gap-1">
+                    <div className={`w-2 h-2 rounded-full ${venue.crowd < 70 ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
+                    <span className="text-xs text-gray-600">{venue.crowd}% full</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Matched to your preferences */}
+          <div className="mb-6">
+            <h2 className="text-2xl font-black text-gray-900 mb-4">Matched for You</h2>
+            <div className="space-y-3">
+              {matchedVenues.slice(0, 3).map((venue) => (
+                <button
+                  key={venue.id}
+                  onClick={() => setSelectedVenue(venue)}
+                  className="w-full bg-white rounded-3xl p-5 shadow-lg border border-gray-100 hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all text-left"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-cyan-100 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0">
+                      {venue.emoji}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-black text-gray-900 text-lg">{venue.name}</h3>
+                            <Zap className="w-4 h-4 text-purple-500" />
+                          </div>
+                          <p className="text-sm text-gray-500">{venue.neighborhood} • {venue.distance}</p>
+                        </div>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSavedVenues(prev => 
+                              prev.includes(venue.id) 
+                                ? prev.filter(id => id !== venue.id)
+                                : [...prev, venue.id]
+                            );
+                          }}
+                          className="p-2"
+                        >
+                          <Heart className={`w-5 h-5 ${savedVenues.includes(venue.id) ? 'fill-rose-500 text-rose-500' : 'text-gray-300'}`} />
+                        </button>
+                      </div>
+
+                      {/* Compact metrics */}
+                      <div className="flex gap-2 mb-3">
+                        <div className={`flex-1 ${venue.crowd < 70 ? 'bg-emerald-50' : 'bg-amber-50'} rounded-xl p-2`}>
+                          <div className="text-xs text-gray-600 mb-1">Crowd</div>
+                          <div className="text-sm font-bold text-gray-900">{venue.crowd}%</div>
+                        </div>
+                        <div className="flex-1 bg-emerald-50 rounded-xl p-2">
+                          <div className="text-xs text-gray-600 mb-1">Safety</div>
+                          <div className="text-sm font-bold text-emerald-600">{venue.safety}%</div>
+                        </div>
+                        <div className="flex-1 bg-blue-50 rounded-xl p-2">
+                          <div className="text-xs text-gray-600 mb-1">Vibe</div>
+                          <div className="text-sm font-bold text-blue-600">{venue.vibe}%</div>
+                        </div>
+                      </div>
+
+                      {/* Social proof */}
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center gap-1">
+                            <ThumbsUp className="w-3 h-3" />
+                            {venue.likes}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {venue.checkins}
+                          </span>
+                        </div>
+                        <div className="flex gap-1">
+                          {venue.tags.slice(0, 1).map((tag, idx) => (
+                            <span key={idx} className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Trending section */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Flame className="w-6 h-6 text-rose-500" />
+              <h2 className="text-2xl font-black text-gray-900">Trending Now</h2>
+            </div>
+            <div className="space-y-3">
+              {trending.slice(0, 2).map((venue) => (
+                <button
+                  key={venue.id}
+                  onClick={() => setSelectedVenue(venue)}
+                  className="w-full bg-gradient-to-br from-rose-50 to-pink-50 rounded-3xl p-5 shadow-md border border-rose-100 hover:shadow-xl hover:scale-[1.01] active:scale-95 transition-all text-left"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-rose-100 to-pink-100 rounded-2xl flex items-center justify-center text-3xl">
+                      {venue.emoji}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-black text-gray-900 text-lg mb-1">{venue.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{venue.type} • {venue.distance}</p>
+                      <div className="flex items-center gap-2 text-xs text-rose-600 font-medium">
+                        <TrendingUp className="w-4 h-4" />
+                        <span>Popular right now • {venue.checkins} people here</span>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const DiscoverView = () => {
     const trending = venues.filter(v => v.trending);
@@ -351,13 +622,14 @@ const App = () => {
                 <div className="flex-1">
                   <h3 className="font-black text-gray-900 text-lg mb-1">{event.name}</h3>
                   <p className="text-sm text-gray-600 mb-2">{event.venue}</p>
-                  <div className="flex items-center gap-3 text-sm">
+                  <div className="flex items-center gap-3 text-sm mb-3">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4 text-gray-500" />
                       <span className="text-gray-700 font-medium">{event.time}</span>
                     </div>
+                    <span className="text-purple-600 font-medium">{event.attendees}</span>
                   </div>
-                  <div className="flex gap-2 mt-3">
+                  <div className="flex gap-2">
                     <div className="flex-1 bg-gray-50 rounded-lg p-2 text-center">
                       <div className="text-sm font-bold text-gray-900">{event.crowd}%</div>
                       <div className="text-xs text-gray-500">Expected</div>
@@ -366,6 +638,9 @@ const App = () => {
                       <div className="text-sm font-bold text-emerald-600">{event.safety}%</div>
                       <div className="text-xs text-gray-500">Safety</div>
                     </div>
+                    <button className="flex-1 bg-purple-500 text-white rounded-lg p-2 font-bold text-xs hover:bg-purple-600 transition-colors">
+                      I'm Going
+                    </button>
                   </div>
                 </div>
               </div>
@@ -447,12 +722,20 @@ const App = () => {
               </div>
               <button onClick={() => setSelectedVenue(null)} className="text-white/60 text-2xl">×</button>
             </div>
-            <button className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold py-4 rounded-xl">
-              <div className="flex items-center justify-center gap-2">
-                <Navigation className="w-5 h-5" />
-                Navigate
-              </div>
-            </button>
+            <div className="flex gap-2 mb-4">
+              <button className="flex-1 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold py-4 rounded-xl">
+                <div className="flex items-center justify-center gap-2">
+                  <Navigation className="w-5 h-5" />
+                  Navigate
+                </div>
+              </button>
+              <button className="bg-white/20 backdrop-blur-xl text-white font-bold px-6 rounded-xl hover:bg-white/30">
+                <Share2 className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="text-xs text-gray-400 text-center">
+              {selectedVenue.checkins} people checked in today
+            </div>
           </div>
         </div>
       )}
@@ -500,31 +783,33 @@ const App = () => {
   return (
     <div className="h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col">
       
+      {activeTab === 'foryou' && <ForYouView />}
       {activeTab === 'discover' && <DiscoverView />}
       {activeTab === 'events' && <EventsView />}
       {activeTab === 'map' && <MapView />}
       {activeTab === 'safety' && <SafetyView />}
 
       <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-2xl border-t border-gray-200 shadow-2xl">
-        <div className="px-4 py-3">
+        <div className="px-2 py-3">
           <div className="flex items-center justify-around">
             {[
+              { id: 'foryou', icon: Sparkles, label: 'For You' },
               { id: 'discover', icon: Eye, label: 'Discover' },
-              { id: 'events', icon: Calendar, label: 'Events' },
               { id: 'map', icon: Navigation, label: 'Map' },
+              { id: 'events', icon: Calendar, label: 'Events' },
               { id: 'safety', icon: Shield, label: 'Safety' }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center gap-1 px-6 py-2 rounded-2xl transition-all ${
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all ${
                   activeTab === tab.id 
                     ? 'bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 scale-110 shadow-lg' 
                     : 'text-gray-400'
                 }`}
               >
-                <tab.icon className={`w-6 h-6 ${activeTab === tab.id ? 'text-white' : ''}`} />
-                <span className={`text-xs font-bold ${activeTab === tab.id ? 'text-white' : ''}`}>
+                <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-white' : ''}`} />
+                <span className={`text-[10px] font-bold ${activeTab === tab.id ? 'text-white' : ''}`}>
                   {tab.label}
                 </span>
               </button>
