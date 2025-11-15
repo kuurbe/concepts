@@ -1,824 +1,672 @@
-import React, { useState, useEffect } from 'react';
-import { MapPin, Navigation, Eye, Shield, Users, Car, Music, TrendingUp, Star, Calendar, AlertCircle, Flame, Coffee, Utensils, Building2, ShoppingBag, Heart, Share2, Bell, User, Sparkles, ThumbsUp, MessageCircle, Bookmark, Clock, Zap, Award, Target } from 'lucide-react';
+import React, { useState, useEffect } from ‘react’;
+import { MapPin, Navigation, AlertCircle, Clock, Shield, Users, TrendingUp, ChevronRight, Play, Info, Bell, Search, Menu } from ‘lucide-react’;
 
 const App = () => {
-  const [appState, setAppState] = useState('loader');
-  const [loaderStep, setLoaderStep] = useState(0);
-  const [activeTab, setActiveTab] = useState('foryou');
-  const [heatMode, setHeatMode] = useState('safety');
-  const [selectedVenue, setSelectedVenue] = useState(null);
-  const [timeOfDay, setTimeOfDay] = useState('evening');
-  const [savedVenues, setSavedVenues] = useState([1, 4]);
-  const [userPreferences, setUserPreferences] = useState(['outdoor', 'food', 'nightlife']);
-  const [showQuickDecision, setShowQuickDecision] = useState(true);
-  const [streakDays, setStreakDays] = useState(7);
+const [appState, setAppState] = useState(‘splash’);
+const [activeView, setActiveView] = useState(‘now’);
+const [selectedVenue, setSelectedVenue] = useState(null);
+const [currentTime, setCurrentTime] = useState(new Date());
+const [liveAlerts, setLiveAlerts] = useState([]);
 
-  useEffect(() => {
-    if (appState === 'loader') {
-      setTimeout(() => setLoaderStep(1), 300);
-      setTimeout(() => setLoaderStep(2), 1200);
-      setTimeout(() => setLoaderStep(3), 2000);
-    }
-  }, [appState]);
+// Real-time clock
+useEffect(() => {
+const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+return () => clearInterval(timer);
+}, []);
 
-  const venues = [
-    { 
-      id: 1, name: 'Klyde Warren Park', type: 'Park', category: 'outdoor',
-      address: '2012 Woodall Rodgers Fwy', neighborhood: 'Downtown',
-      crowd: 68, parking: 52, vibe: 94, safety: 96, rating: 4.8,
-      lat: 32.7890, lng: -96.8010, emoji: '🌳', distance: '0.2 mi',
-      hours: 'Open 24/7', popular: true, trending: true,
-      checkins: 234, likes: 890, tags: ['family-friendly', 'instagram-worthy', 'free']
-    },
-    { 
-      id: 2, name: 'Pecan Lodge', type: 'BBQ Restaurant', category: 'food',
-      address: '2702 Main St', neighborhood: 'Deep Ellum',
-      crowd: 92, parking: 45, vibe: 91, safety: 88, rating: 4.7,
-      lat: 32.7820, lng: -96.7850, emoji: '🍖', distance: '1.1 mi',
-      hours: '11 AM - 9 PM', popular: true, trending: false,
-      checkins: 456, likes: 1240, tags: ['must-try', 'authentic', 'long-wait']
-    },
-    { 
-      id: 3, name: 'Reunion Tower', type: 'Observation Deck', category: 'attraction',
-      address: '300 Reunion Blvd E', neighborhood: 'Downtown',
-      crowd: 42, parking: 81, vibe: 96, safety: 98, rating: 4.9,
-      lat: 32.7755, lng: -96.8089, emoji: '🏙️', distance: '0.6 mi',
-      hours: '10 AM - 10 PM', popular: true, trending: false,
-      checkins: 189, likes: 2100, tags: ['romantic', 'views', 'date-night']
-    },
-    { 
-      id: 4, name: 'The Rustic', type: 'Live Music Venue', category: 'nightlife',
-      address: '3656 Howell St', neighborhood: 'Uptown',
-      crowd: 88, parking: 38, vibe: 97, safety: 85, rating: 4.6,
-      lat: 32.8021, lng: -96.7989, emoji: '🎸', distance: '2.8 mi',
-      hours: '4 PM - 2 AM', popular: true, trending: true,
-      checkins: 678, likes: 1560, tags: ['live-music', 'outdoor', 'energetic']
-    },
-    { 
-      id: 5, name: 'Dallas Museum of Art', type: 'Museum', category: 'culture',
-      address: '1717 N Harwood St', neighborhood: 'Arts District',
-      crowd: 35, parking: 88, vibe: 89, safety: 97, rating: 4.8,
-      lat: 32.7876, lng: -96.8010, emoji: '🎨', distance: '0.4 mi',
-      hours: '11 AM - 5 PM', popular: false, trending: false,
-      checkins: 123, likes: 780, tags: ['cultural', 'quiet', 'educational']
-    },
-    { 
-      id: 6, name: 'Bishop Arts District', type: 'Shopping District', category: 'shopping',
-      address: 'N Bishop Ave', neighborhood: 'Oak Cliff',
-      crowd: 73, parking: 56, vibe: 93, safety: 90, rating: 4.7,
-      lat: 32.7490, lng: -96.8217, emoji: '🛍️', distance: '4.2 mi',
-      hours: '10 AM - 10 PM', popular: true, trending: true,
-      checkins: 345, likes: 1120, tags: ['boutique', 'local', 'walkable']
-    },
-    { 
-      id: 7, name: 'Deep Ellum Brewing', type: 'Brewery', category: 'nightlife',
-      address: '2823 St Louis St', neighborhood: 'Deep Ellum',
-      crowd: 81, parking: 62, vibe: 88, safety: 86, rating: 4.5,
-      lat: 32.7839, lng: -96.7764, emoji: '🍺', distance: '1.4 mi',
-      hours: '12 PM - 11 PM', popular: false, trending: true,
-      checkins: 289, likes: 934, tags: ['craft-beer', 'casual', 'groups']
-    },
-    { 
-      id: 8, name: 'Sixty Vines', type: 'Wine Bar', category: 'food',
-      address: '3701 McKinney Ave', neighborhood: 'Uptown',
-      crowd: 65, parking: 71, vibe: 90, safety: 92, rating: 4.6,
-      lat: 32.8039, lng: -96.7989, emoji: '🍷', distance: '2.9 mi',
-      hours: '11 AM - 11 PM', popular: false, trending: false,
-      checkins: 167, likes: 645, tags: ['upscale', 'wine', 'date-night']
-    }
-  ];
+// Simulated live alerts
+useEffect(() => {
+if (appState === ‘main’) {
+const alertInterval = setInterval(() => {
+// Simulate incoming alerts
+const newAlert = {
+id: Date.now(),
+type: Math.random() > 0.5 ? ‘crowd’ : ‘safety’,
+severity: Math.random() > 0.7 ? ‘high’ : ‘medium’,
+message: ‘Bishop Arts crowd increasing’,
+time: new Date()
+};
+setLiveAlerts(prev => [newAlert, …prev.slice(0, 4)]);
+}, 15000);
+return () => clearInterval(alertInterval);
+}
+}, [appState]);
 
-  const liveEvents = [
-    {
-      id: 1, name: 'Dallas Mavericks vs Lakers', venue: 'American Airlines Center',
-      time: 'Tonight 7:30 PM', category: 'Sports', crowd: 98, safety: 93,
-      emoji: '🏀', address: '2500 Victory Ave', attendees: '18.4K going'
-    },
-    {
-      id: 2, name: 'Deep Ellum Art Walk', venue: 'Deep Ellum',
-      time: 'Saturday 6:00 PM', category: 'Art', crowd: 75, safety: 89,
-      emoji: '🎨', address: 'Main St', attendees: '2.1K going'
-    },
-    {
-      id: 3, name: 'Food Truck Rally', venue: 'Klyde Warren Park',
-      time: 'Tomorrow 5:00 PM', category: 'Food', crowd: 82, safety: 95,
-      emoji: '🍔', address: '2012 Woodall Rodgers', attendees: '890 going'
-    }
-  ];
+// VENUE DATA - Real-time Oak Cliff
+const venues = [
+{
+id: 1,
+name: ‘Bishop Arts District’,
+type: ‘Arts & Shopping’,
+address: ‘N Bishop Ave, Oak Cliff’,
+distance: ‘0.3 mi’,
+status: ‘moderate’,
+crowd: 68,
+safety: 94,
+trending: true,
+image: ‘🎨’,
+description: ‘Gallery openings and boutique shopping’,
+peakTime: ‘7:00 PM’,
+currentWait: ‘No wait’,
+isOpen: true,
+hours: ‘Open until 10 PM’,
+civicZone: ‘Oak Cliff Arts District’,
+alerts: [‘Street event 6-9 PM’, ‘Limited parking on Bishop Ave’]
+},
+{
+id: 2,
+name: ‘Kessler Theater’,
+type: ‘Live Venue’,
+address: ‘1230 W Davis St’,
+distance: ‘0.8 mi’,
+status: ‘clear’,
+crowd: 42,
+safety: 96,
+trending: false,
+image: ‘🎭’,
+description: ‘Historic theater with live performances’,
+peakTime: ‘8:30 PM’,
+currentWait: ‘Tickets available’,
+isOpen: true,
+hours: ‘Show at 8 PM’,
+civicZone: ‘Historic Oak Cliff’,
+alerts: []
+},
+{
+id: 3,
+name: ‘Fuel City Tacos’,
+type: ‘Restaurant’,
+address: ‘801 S Riverfront Blvd’,
+distance: ‘1.2 mi’,
+status: ‘busy’,
+crowd: 85,
+safety: 90,
+trending: true,
+image: ‘🌮’,
+description: ‘Authentic tacos, open 24/7’,
+peakTime: ‘Always busy’,
+currentWait: ‘15-20 min’,
+isOpen: true,
+hours: ‘Open 24/7’,
+civicZone: ‘Industrial District’,
+alerts: [‘High volume’, ‘Cash preferred’]
+},
+{
+id: 4,
+name: ‘Trinity River Park’,
+type: ‘Outdoor’,
+address: ‘Great Trinity Forest’,
+distance: ‘1.5 mi’,
+status: ‘clear’,
+crowd: 28,
+safety: 98,
+trending: false,
+image: ‘🌳’,
+description: ‘6,000 acres of urban forest and trails’,
+peakTime: ‘Sunset (6:45 PM)’,
+currentWait: ‘Open access’,
+isOpen: true,
+hours: ‘Dawn to dusk’,
+civicZone: ‘Great Trinity Forest’,
+alerts: []
+},
+{
+id: 5,
+name: ‘Oak Cliff Brewing’,
+type: ‘Brewery’,
+address: ‘301 E 8th St’,
+distance: ‘0.6 mi’,
+status: ‘moderate’,
+crowd: 72,
+safety: 92,
+trending: true,
+image: ‘🍺’,
+description: ‘Craft brewery with patio seating’,
+peakTime: ‘Happy hour now’,
+currentWait: ‘5-10 min for table’,
+isOpen: true,
+hours: ‘Open until midnight’,
+civicZone: ‘Oak Cliff Commercial’,
+alerts: [‘Live music at 8 PM’]
+}
+];
 
-  const safetyData = {
-    overall: 94,
-    trend: '+5',
-    alerts: [
-      { type: 'High Traffic', location: 'I-35E & Woodall Rogers', level: 'medium', time: '5m ago' },
-      { type: 'Large Crowd', location: 'American Airlines Center', level: 'high', time: '12m ago' }
-    ],
-    safestAreas: ['Arts District', 'Uptown', 'Highland Park'],
-    incidents: 2
-  };
+// CIVIC INTELLIGENCE
+const oakCliffStatus = {
+overall: ‘SAFE’,
+safetyScore: 94,
+activeIncidents: 0,
+trafficLevel: ‘MODERATE’,
+crowdLevel: ‘MODERATE’,
+trend: ‘IMPROVING’,
+lastUpdate: new Date(),
+alerts: [
+{ type: ‘event’, message: ‘First Friday Art Walk - Bishop Ave closed’, severity: ‘medium’ },
+{ type: ‘traffic’, message: ‘I-35E southbound delays near Colorado’, severity: ‘low’ }
+]
+};
 
-  if (appState === 'loader') {
-    return (
-      <div 
-        onClick={() => setAppState('permission')}
-        className="h-screen bg-black relative overflow-hidden cursor-pointer"
-      >
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] bg-purple-600/30 rounded-full blur-[150px]" 
-               style={{ animation: 'pulse 4s ease-in-out infinite' }}></div>
-          <div className="absolute bottom-1/4 right-1/3 w-[500px] h-[500px] bg-cyan-600/30 rounded-full blur-[150px]" 
-               style={{ animation: 'pulse 5s ease-in-out infinite 1s' }}></div>
-        </div>
+if (appState === ‘splash’) {
+return (
+<div className="h-screen bg-black relative overflow-hidden">
+{/* Subtle grid pattern */}
+<div className="absolute inset-0 opacity-10">
+<div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
+</div>
 
-        <div className="relative h-full flex flex-col items-center justify-center">
-          
-          <div className="overflow-hidden mb-4">
-            <h1 
-              className={`text-[10rem] font-black text-white tracking-tight transition-all duration-1000 ${
-                loaderStep >= 1 ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
-              }`}
-              style={{ 
-                textShadow: '0 0 80px rgba(139, 92, 246, 0.8)',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif'
-              }}
-            >
-              KROWD
-            </h1>
-          </div>
+```
+<div className="relative h-full flex flex-col items-center justify-center px-8">
+<div className="text-center">
+{/* Logo */}
+<div className="mb-8">
+<div className="inline-flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-xl rounded-full border border-white/10">
+<MapPin className="w-8 h-8 text-red-500" strokeWidth={2} />
+<h1 className="text-5xl font-bold text-white tracking-tight">KROWD</h1>
+</div>
+</div>
 
-          <div className="overflow-hidden mb-8">
-            <h1 
-              className={`text-[10rem] font-black bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent tracking-tight transition-all duration-1000 ${
-                loaderStep >= 2 ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
-              }`}
-              style={{ 
-                textShadow: '0 0 80px rgba(34, 211, 238, 0.6)',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif'
-              }}
-            >
-              GUIDE
-            </h1>
-          </div>
+<p className="text-2xl text-gray-400 mb-12 font-light">
+Oak Cliff Intelligence
+</p>
 
-          {loaderStep >= 3 && (
-            <div className="animate-in fade-in duration-700">
-              <p className="text-2xl text-white/80 font-light mb-12">Real-time intelligence for Dallas</p>
-              <div className="flex items-center gap-3 px-8 py-4 bg-white/10 backdrop-blur-xl rounded-full border border-white/20">
-                <span className="text-white font-semibold">Tap to begin</span>
-                <div className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></div>
-              </div>
-            </div>
-          )}
-        </div>
+<button
+onClick={() => setAppState('main')}
+className="group relative px-10 py-4 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-lg shadow-2xl transition-all"
+>
+Start Exploring
+</button>
 
-        <style>{`
-          @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.1); opacity: 0.5; }
-          }
-        `}</style>
-      </div>
-    );
-  }
+<div className="mt-12 flex items-center justify-center gap-2 text-sm text-gray-600">
+<Shield className="w-4 h-4" />
+<span>Powered by Dallas Open Data</span>
+</div>
+</div>
+</div>
+</div>
+);
+```
 
-  if (appState === 'permission') {
-    return (
-      <div className="h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center px-6 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600/30 rounded-full blur-[120px] animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-600/30 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }}></div>
-        </div>
+}
 
-        <div className="relative max-w-lg w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <div className="mb-10 text-center">
-            <div className="inline-block relative mb-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full blur-3xl opacity-60"></div>
-              <div className="relative w-32 h-32 mx-auto bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-500 rounded-[2.5rem] flex items-center justify-center shadow-2xl">
-                <MapPin className="w-16 h-16 text-white" />
-              </div>
-            </div>
-          </div>
+// STATUS INDICATOR COMPONENT
+const StatusBadge = ({ status }) => {
+const config = {
+clear: { bg: ‘bg-emerald-500/10’, text: ‘text-emerald-400’, border: ‘border-emerald-500/20’, label: ‘CLEAR’ },
+moderate: { bg: ‘bg-amber-500/10’, text: ‘text-amber-400’, border: ‘border-amber-500/20’, label: ‘MODERATE’ },
+busy: { bg: ‘bg-red-500/10’, text: ‘text-red-400’, border: ‘border-red-500/20’, label: ‘BUSY’ }
+};
+const style = config[status] || config.clear;
 
-          <h2 className="text-5xl font-black text-white mb-6 text-center leading-tight">
-            Enable Your<br/>Experience
-          </h2>
+```
+return (
+<div className={`inline-flex items-center gap-2 px-3 py-1 ${style.bg} ${style.text} border ${style.border} rounded-full text-xs font-bold tracking-wide`}>
+<div className={`w-2 h-2 rounded-full ${style.text.replace('text-', 'bg-')} animate-pulse`}></div>
+{style.label}
+</div>
+);
+```
 
-          <p className="text-xl text-gray-300 text-center mb-12 leading-relaxed px-4">
-            Get live crowd levels, parking availability, and safety scores for venues near you.
-          </p>
+};
 
-          <button
-            onClick={() => setAppState('main')}
-            className="w-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 text-white text-xl font-bold py-6 rounded-2xl shadow-2xl shadow-purple-500/50 hover:shadow-cyan-500/50 hover:scale-[1.02] active:scale-95 transition-all"
-          >
-            Continue
-          </button>
+// NOW VIEW - Real-time intelligence
+const NowView = () => {
+const featuredVenue = venues[0];
 
-          <p className="text-sm text-gray-500 text-center mt-8">
-            🔒 Your data is encrypted and never shared
-          </p>
-        </div>
-      </div>
-    );
-  }
+```
+return (
+<div className="h-full overflow-y-auto pb-24 bg-black">
+{/* Hero Section - Featured Venue */}
+<div className="relative h-[60vh] overflow-hidden">
+{/* Gradient overlay */}
+<div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10"></div>
+{/* Background pattern (simulating image) */}
+<div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-black">
+<div className="absolute inset-0 flex items-center justify-center opacity-20">
+<div className="text-[20rem]">{featuredVenue.image}</div>
+</div>
+</div>
 
-  // QUICK DECISION CARD - Smart recommendation engine
-  const QuickDecisionCard = () => {
-    const recommendedVenue = venues.find(v => v.id === 1); // Smart logic would go here
-    
-    return (
-      <div className="relative mb-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-[2.5rem] blur-2xl opacity-30"></div>
-        <div className="relative bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-600 rounded-[2.5rem] p-6 shadow-2xl">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-yellow-300" />
-              <span className="text-sm font-bold text-white/90 uppercase tracking-wide">Perfect for you</span>
-            </div>
-            <button className="text-white/60 hover:text-white">
-              <Target className="w-5 h-5" />
-            </button>
-          </div>
+{/* Content */}
+<div className="relative z-20 h-full flex flex-col justify-end p-6 pb-12">
+<StatusBadge status={featuredVenue.status} />
+<h1 className="text-5xl font-bold text-white mt-4 mb-3 leading-tight">
+{featuredVenue.name}
+</h1>
+<p className="text-lg text-gray-300 mb-4 max-w-md">
+{featuredVenue.description}
+</p>
 
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center text-4xl">
-              {recommendedVenue.emoji}
-            </div>
-            <div className="flex-1">
-              <h3 className="text-2xl font-black text-white mb-1">{recommendedVenue.name}</h3>
-              <p className="text-white/80 text-sm">{recommendedVenue.distance} away • {recommendedVenue.neighborhood}</p>
-            </div>
-          </div>
+<div className="flex items-center gap-4 text-sm text-gray-400 mb-6">
+<span className="flex items-center gap-1">
+<MapPin className="w-4 h-4" />
+{featuredVenue.distance}
+</span>
+<span className="flex items-center gap-1">
+<Clock className="w-4 h-4" />
+{featuredVenue.peakTime}
+</span>
+<span className="flex items-center gap-1">
+<Users className="w-4 h-4" />
+{featuredVenue.crowd}% capacity
+</span>
+</div>
 
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            <div className="bg-white/10 backdrop-blur-xl rounded-xl p-3 text-center">
-              <div className="text-2xl font-black text-white">{recommendedVenue.crowd}%</div>
-              <div className="text-xs text-white/70">Crowd</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-xl rounded-xl p-3 text-center">
-              <div className="text-2xl font-black text-emerald-300">{recommendedVenue.safety}%</div>
-              <div className="text-xs text-white/70">Safety</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-xl rounded-xl p-3 text-center">
-              <div className="text-2xl font-black text-white">{recommendedVenue.parking}%</div>
-              <div className="text-xs text-white/70">Parking</div>
-            </div>
-          </div>
+{/* Action buttons */}
+<div className="flex gap-3">
+<button
+onClick={() => setSelectedVenue(featuredVenue)}
+className="flex items-center gap-2 px-8 py-3 bg-white text-black rounded-lg font-bold hover:bg-gray-200 transition-colors"
+>
+<Play className="w-5 h-5" fill="currentColor" />
+Navigate
+</button>
+<button className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-xl text-white rounded-lg font-semibold hover:bg-white/20 transition-colors border border-white/20">
+<Info className="w-5 h-5" />
+Details
+</button>
+</div>
+</div>
+</div>
 
-          <div className="flex gap-2">
-            <button className="flex-1 bg-white text-purple-600 font-bold py-4 rounded-xl hover:scale-[1.02] active:scale-95 transition-all shadow-lg">
-              Go Now
-            </button>
-            <button className="bg-white/20 backdrop-blur-xl text-white font-bold px-6 py-4 rounded-xl hover:bg-white/30 transition-all">
-              <Share2 className="w-5 h-5" />
-            </button>
-          </div>
+{/* Live Alerts Bar */}
+{oakCliffStatus.alerts.length > 0 && (
+<div className="px-6 py-4 bg-amber-500/10 border-l-4 border-amber-500">
+<div className="flex items-start gap-3">
+<AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+<div className="flex-1">
+<div className="text-sm font-bold text-amber-400 mb-1">ACTIVE ALERTS</div>
+{oakCliffStatus.alerts.map((alert, idx) => (
+<div key={idx} className="text-sm text-gray-300">{alert.message}</div>
+))}
+</div>
+<div className="text-xs text-gray-500">LIVE</div>
+</div>
+</div>
+)}
 
-          <div className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between text-sm">
-            <span className="text-white/70">Why this? Based on your preferences</span>
-            <div className="flex gap-1">
-              {recommendedVenue.tags.slice(0, 2).map((tag, idx) => (
-                <span key={idx} className="bg-white/10 px-2 py-1 rounded-lg text-white/80 text-xs">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
+{/* Trending Now */}
+<div className="px-6 py-8">
+<div className="flex items-center justify-between mb-6">
+<h2 className="text-2xl font-bold text-white">Trending Now</h2>
+<button className="text-sm text-gray-400 hover:text-white transition-colors">
+See All
+</button>
+</div>
 
-  // FOR YOU TAB - Personalized feed
-  const ForYouView = () => {
-    const trending = venues.filter(v => v.trending);
-    const matchedVenues = venues.filter(v => userPreferences.includes(v.category));
+<div className="space-y-3">
+{venues.filter(v => v.trending).slice(1).map((venue) => (
+<button
+key={venue.id}
+onClick={() => setSelectedVenue(venue)}
+className="w-full group bg-white/5 hover:bg-white/10 backdrop-blur-xl rounded-xl p-4 transition-all border border-white/10 hover:border-white/20 text-left"
+>
+<div className="flex items-start gap-4">
+<div className="w-20 h-20 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center text-4xl flex-shrink-0">
+{venue.image}
+</div>
+<div className="flex-1 min-w-0">
+<div className="flex items-start justify-between mb-2">
+<div className="flex-1">
+<h3 className="text-lg font-bold text-white mb-1">{venue.name}</h3>
+<p className="text-sm text-gray-400">{venue.type}</p>
+</div>
+<StatusBadge status={venue.status} />
+</div>
 
-    return (
-      <div className="h-full overflow-y-auto pb-32" style={{ scrollBehavior: 'smooth' }}>
-        {/* Header with user stats */}
-        <div className="sticky top-0 z-10 bg-gradient-to-b from-white via-white to-transparent pb-4">
-          <div className="px-6 pt-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h1 className="text-4xl font-black text-gray-900 mb-1">For You</h1>
-                <p className="text-sm text-gray-600">Personalized recommendations</p>
-              </div>
-              <button className="relative">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center">
-                  <User className="w-6 h-6 text-white" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-rose-500 rounded-full border-2 border-white flex items-center justify-center">
-                  <span className="text-xs font-bold text-white">{streakDays}</span>
-                </div>
-              </button>
-            </div>
+<div className="flex items-center gap-4 text-xs text-gray-500 mb-2">
+<span>{venue.distance}</span>
+<span>•</span>
+<span>{venue.currentWait}</span>
+</div>
 
-            {/* Streak tracker */}
-            <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 mb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center">
-                    <Flame className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-white/90">Exploration Streak</div>
-                    <div className="text-2xl font-black text-white">{streakDays} days</div>
-                  </div>
-                </div>
-                <Award className="w-8 h-8 text-white/80" />
-              </div>
-            </div>
-          </div>
-        </div>
+{venue.alerts.length > 0 && (
+<div className="flex items-center gap-2 text-xs text-amber-400">
+<AlertCircle className="w-3 h-3" />
+<span>{venue.alerts[0]}</span>
+</div>
+)}
+</div>
 
-        <div className="px-6">
-          {/* Quick Decision Card */}
-          {showQuickDecision && <QuickDecisionCard />}
+<ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors flex-shrink-0 mt-6" />
+</div>
+</button>
+))}
+</div>
+</div>
 
-          {/* Saved/Favorites */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
-                <Heart className="w-6 h-6 fill-rose-500 text-rose-500" />
-                Your Favorites
-              </h2>
-              <button className="text-sm font-bold text-purple-600">See all</button>
-            </div>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-              {venues.filter(v => savedVenues.includes(v.id)).map((venue) => (
-                <div
-                  key={venue.id}
-                  className="flex-shrink-0 w-48 bg-white rounded-2xl p-4 shadow-lg border border-gray-100"
-                >
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-cyan-100 rounded-xl flex items-center justify-center text-3xl mb-3">
-                    {venue.emoji}
-                  </div>
-                  <h3 className="font-bold text-gray-900 text-sm mb-1 truncate">{venue.name}</h3>
-                  <p className="text-xs text-gray-500 mb-2">{venue.distance}</p>
-                  <div className="flex items-center gap-1">
-                    <div className={`w-2 h-2 rounded-full ${venue.crowd < 70 ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
-                    <span className="text-xs text-gray-600">{venue.crowd}% full</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+{/* All Venues */}
+<div className="px-6 pb-8">
+<h2 className="text-2xl font-bold text-white mb-6">All Locations</h2>
+<div className="space-y-2">
+{venues.map((venue) => (
+<button
+key={venue.id}
+onClick={() => setSelectedVenue(venue)}
+className="w-full group bg-white/5 hover:bg-white/10 backdrop-blur-xl rounded-lg p-4 transition-all border border-white/5 hover:border-white/10 text-left"
+>
+<div className="flex items-center gap-4">
+<div className="w-14 h-14 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center text-2xl">
+{venue.image}
+</div>
+<div className="flex-1 min-w-0">
+<div className="flex items-center justify-between mb-1">
+<h3 className="text-base font-semibold text-white">{venue.name}</h3>
+<StatusBadge status={venue.status} />
+</div>
+<p className="text-sm text-gray-500">{venue.distance} • {venue.currentWait}</p>
+</div>
 
-          {/* Matched to your preferences */}
-          <div className="mb-6">
-            <h2 className="text-2xl font-black text-gray-900 mb-4">Matched for You</h2>
-            <div className="space-y-3">
-              {matchedVenues.slice(0, 3).map((venue) => (
-                <button
-                  key={venue.id}
-                  onClick={() => setSelectedVenue(venue)}
-                  className="w-full bg-white rounded-3xl p-5 shadow-lg border border-gray-100 hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all text-left"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-cyan-100 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0">
-                      {venue.emoji}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-black text-gray-900 text-lg">{venue.name}</h3>
-                            <Zap className="w-4 h-4 text-purple-500" />
-                          </div>
-                          <p className="text-sm text-gray-500">{venue.neighborhood} • {venue.distance}</p>
-                        </div>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSavedVenues(prev => 
-                              prev.includes(venue.id) 
-                                ? prev.filter(id => id !== venue.id)
-                                : [...prev, venue.id]
-                            );
-                          }}
-                          className="p-2"
-                        >
-                          <Heart className={`w-5 h-5 ${savedVenues.includes(venue.id) ? 'fill-rose-500 text-rose-500' : 'text-gray-300'}`} />
-                        </button>
-                      </div>
+<ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors" />
+</div>
+</button>
+))}
+</div>
+</div>
+</div>
+);
+```
 
-                      {/* Compact metrics */}
-                      <div className="flex gap-2 mb-3">
-                        <div className={`flex-1 ${venue.crowd < 70 ? 'bg-emerald-50' : 'bg-amber-50'} rounded-xl p-2`}>
-                          <div className="text-xs text-gray-600 mb-1">Crowd</div>
-                          <div className="text-sm font-bold text-gray-900">{venue.crowd}%</div>
-                        </div>
-                        <div className="flex-1 bg-emerald-50 rounded-xl p-2">
-                          <div className="text-xs text-gray-600 mb-1">Safety</div>
-                          <div className="text-sm font-bold text-emerald-600">{venue.safety}%</div>
-                        </div>
-                        <div className="flex-1 bg-blue-50 rounded-xl p-2">
-                          <div className="text-xs text-gray-600 mb-1">Vibe</div>
-                          <div className="text-sm font-bold text-blue-600">{venue.vibe}%</div>
-                        </div>
-                      </div>
+};
 
-                      {/* Social proof */}
-                      <div className="flex items-center justify-between text-xs text-gray-500">
-                        <div className="flex items-center gap-3">
-                          <span className="flex items-center gap-1">
-                            <ThumbsUp className="w-3 h-3" />
-                            {venue.likes}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Users className="w-3 h-3" />
-                            {venue.checkins}
-                          </span>
-                        </div>
-                        <div className="flex gap-1">
-                          {venue.tags.slice(0, 1).map((tag, idx) => (
-                            <span key={idx} className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
+// MAP VIEW
+const MapView = () => (
+<div className="h-full relative bg-black">
+{/* Dark map background */}
+<div className="absolute inset-0 bg-gradient-to-b from-gray-900 to-black">
+<div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
 
-          {/* Trending section */}
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Flame className="w-6 h-6 text-rose-500" />
-              <h2 className="text-2xl font-black text-gray-900">Trending Now</h2>
-            </div>
-            <div className="space-y-3">
-              {trending.slice(0, 2).map((venue) => (
-                <button
-                  key={venue.id}
-                  onClick={() => setSelectedVenue(venue)}
-                  className="w-full bg-gradient-to-br from-rose-50 to-pink-50 rounded-3xl p-5 shadow-md border border-rose-100 hover:shadow-xl hover:scale-[1.01] active:scale-95 transition-all text-left"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-rose-100 to-pink-100 rounded-2xl flex items-center justify-center text-3xl">
-                      {venue.emoji}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-black text-gray-900 text-lg mb-1">{venue.name}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{venue.type} • {venue.distance}</p>
-                      <div className="flex items-center gap-2 text-xs text-rose-600 font-medium">
-                        <TrendingUp className="w-4 h-4" />
-                        <span>Popular right now • {venue.checkins} people here</span>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
+```
+{/* Venue markers */}
+{venues.map((venue, idx) => {
+const statusColor =
+venue.status === 'clear' ? 'from-emerald-400 to-green-400' :
+venue.status === 'moderate' ? 'from-amber-400 to-orange-400' :
+'from-red-400 to-rose-400';
+return (
+<button
+key={venue.id}
+className="absolute transform -translate-x-1/2 -translate-y-1/2 group"
+style={{
+left: `${20 + idx * 15}%`,
+top: `${25 + (idx % 3) * 25}%`
+}}
+onClick={() => setSelectedVenue(venue)}
+>
+{/* Glow */}
+<div className={`w-32 h-32 bg-gradient-to-br ${statusColor} rounded-full blur-[60px] opacity-30 group-hover:opacity-50 transition-opacity`}></div>
+{/* Marker */}
+<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+<div className="bg-black/90 backdrop-blur-xl rounded-xl p-3 border border-white/20 shadow-2xl min-w-[140px]">
+<div className="flex items-center gap-2 mb-2">
+<div className={`w-10 h-10 bg-gradient-to-br ${statusColor} rounded-lg flex items-center justify-center text-xl`}>
+{venue.image}
+</div>
+<div className="flex-1 min-w-0">
+<div className="text-xs font-bold text-white truncate">{venue.name}</div>
+<div className="text-xs text-gray-500">{venue.distance}</div>
+</div>
+</div>
+<StatusBadge status={venue.status} />
+</div>
+</div>
+</button>
+);
+})}
 
-  const DiscoverView = () => {
-    const trending = venues.filter(v => v.trending);
+{/* User location */}
+<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+<div className="relative">
+<div className="w-6 h-6 bg-blue-500 rounded-full border-4 border-black shadow-lg"></div>
+<div className="absolute inset-0 w-6 h-6 bg-blue-500 rounded-full animate-ping"></div>
+</div>
+</div>
+</div>
 
-    return (
-      <div className="h-full overflow-y-auto pb-32" style={{ scrollBehavior: 'smooth' }}>
-        <div className="sticky top-0 z-10 bg-gradient-to-b from-white via-white to-transparent pb-6">
-          <div className="px-6 pt-8">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-sm font-bold text-gray-600 uppercase tracking-wider">Live Data</span>
-            </div>
-            <h1 className="text-5xl font-black text-gray-900 mb-2 leading-tight">
-              Discover<br/>Dallas
-            </h1>
-            <p className="text-lg text-gray-600">8 venues • {timeOfDay}</p>
-          </div>
-        </div>
+{/* Map controls */}
+<div className="absolute top-6 left-6 right-6 z-20">
+<div className="bg-black/80 backdrop-blur-2xl rounded-xl p-4 border border-white/10">
+<div className="flex items-center justify-between mb-3">
+<div className="text-white font-bold">Oak Cliff Live</div>
+<div className="flex items-center gap-2 text-xs text-gray-400">
+<div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+UPDATING
+</div>
+</div>
+<div className="grid grid-cols-3 gap-2 text-xs">
+<div className="text-center py-2 bg-white/5 rounded-lg border border-white/10">
+<div className="text-emerald-400 font-bold">{oakCliffStatus.safetyScore}</div>
+<div className="text-gray-500">Safety</div>
+</div>
+<div className="text-center py-2 bg-white/5 rounded-lg border border-white/10">
+<div className="text-amber-400 font-bold">{oakCliffStatus.trafficLevel}</div>
+<div className="text-gray-500">Traffic</div>
+</div>
+<div className="text-center py-2 bg-white/5 rounded-lg border border-white/10">
+<div className="text-white font-bold">{venues.filter(v => v.trending).length}</div>
+<div className="text-gray-500">Trending</div>
+</div>
+</div>
+</div>
+</div>
 
-        <div className="px-6 mb-8">
-          <div className="grid grid-cols-4 gap-3">
-            {[
-              { icon: Shield, value: '94%', label: 'Safe', color: 'from-emerald-500 to-green-500' },
-              { icon: Users, value: '2.4K', label: 'Active', color: 'from-purple-500 to-violet-500' },
-              { icon: Car, value: '68%', label: 'Parking', color: 'from-blue-500 to-cyan-500' },
-              { icon: Flame, value: '6', label: 'Trending', color: 'from-rose-500 to-pink-500' }
-            ].map((stat, idx) => (
-              <button 
-                key={idx}
-                className="group relative"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} rounded-2xl blur-lg opacity-0 group-hover:opacity-60 transition-opacity`}></div>
-                <div className={`relative bg-gradient-to-br ${stat.color} rounded-2xl p-4 shadow-lg hover:scale-105 active:scale-95 transition-transform`}>
-                  <stat.icon className="w-5 h-5 text-white mb-2" />
-                  <div className="text-2xl font-black text-white">{stat.value}</div>
-                  <div className="text-xs text-white/80 font-medium">{stat.label}</div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+{/* Selected venue bottom sheet */}
+{selectedVenue && (
+<div className="absolute bottom-0 left-0 right-0 z-30 animate-in slide-in-from-bottom-4">
+<div className="px-6 pb-24">
+<div className="bg-black/95 backdrop-blur-2xl rounded-2xl p-6 border border-white/20 shadow-2xl">
+<div className="flex justify-between items-start mb-4">
+<div className="flex items-start gap-4">
+<div className="w-16 h-16 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center text-3xl">
+{selectedVenue.image}
+</div>
+<div>
+<h3 className="text-xl font-bold text-white mb-1">{selectedVenue.name}</h3>
+<p className="text-sm text-gray-400 mb-2">{selectedVenue.address}</p>
+<StatusBadge status={selectedVenue.status} />
+</div>
+</div>
+<button
+onClick={() => setSelectedVenue(null)}
+className="text-gray-500 hover:text-white text-2xl leading-none"
+>
+×
+</button>
+</div>
 
-        <div className="px-6 mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Flame className="w-5 h-5 text-rose-500" />
-            <h2 className="text-2xl font-black text-gray-900">Trending Now</h2>
-          </div>
-          <div className="space-y-3">
-            {trending.map((venue) => (
-              <button
-                key={venue.id}
-                onClick={() => setSelectedVenue(venue)}
-                className="w-full bg-white rounded-3xl p-5 shadow-lg border border-gray-100 hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all text-left"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-rose-100 to-pink-100 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0">
-                    {venue.emoji}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="font-black text-gray-900 text-lg">{venue.name}</h3>
-                        <p className="text-sm text-gray-500">{venue.neighborhood} • {venue.distance}</p>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                        <span className="font-bold text-sm">{venue.rating}</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      {[
-                        { label: 'Crowd', value: venue.crowd, icon: Users },
-                        { label: 'Parking', value: venue.parking, icon: Car },
-                        { label: 'Vibe', value: venue.vibe, icon: Music },
-                        { label: 'Safety', value: venue.safety, icon: Shield }
-                      ].map((metric, idx) => (
-                        <div key={idx} className="flex-1 bg-gray-50 rounded-xl p-2 text-center">
-                          <metric.icon className={`w-4 h-4 mx-auto mb-1 ${
-                            metric.label === 'Crowd' && metric.value > 80 ? 'text-rose-500' :
-                            metric.label === 'Parking' && metric.value < 50 ? 'text-amber-500' :
-                            'text-emerald-500'
-                          }`} />
-                          <div className="text-xs font-bold text-gray-900">{metric.value}%</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+<div className="grid grid-cols-3 gap-2 mb-4 text-xs">
+<div className="bg-white/5 rounded-lg p-2 text-center border border-white/10">
+<div className="text-lg font-bold text-white">{selectedVenue.crowd}%</div>
+<div className="text-gray-500">Capacity</div>
+</div>
+<div className="bg-white/5 rounded-lg p-2 text-center border border-white/10">
+<div className="text-lg font-bold text-emerald-400">{selectedVenue.safety}%</div>
+<div className="text-gray-500">Safety</div>
+</div>
+<div className="bg-white/5 rounded-lg p-2 text-center border border-white/10">
+<div className="text-lg font-bold text-white">{selectedVenue.currentWait}</div>
+<div className="text-gray-500">Wait</div>
+</div>
+</div>
 
-        <div className="px-6">
-          <h2 className="text-2xl font-black text-gray-900 mb-4">All Venues</h2>
-          <div className="space-y-3">
-            {venues.map((venue) => (
-              <button
-                key={venue.id}
-                onClick={() => setSelectedVenue(venue)}
-                className="w-full bg-white rounded-3xl p-4 shadow-md border border-gray-100 hover:shadow-xl hover:scale-[1.01] active:scale-95 transition-all text-left"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-cyan-100 rounded-xl flex items-center justify-center text-2xl">
-                    {venue.emoji}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-gray-900 truncate">{venue.name}</h3>
-                    <p className="text-xs text-gray-500">{venue.type}</p>
-                  </div>
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
-                    venue.safety >= 90 ? 'bg-emerald-500 text-white' :
-                    venue.safety >= 80 ? 'bg-amber-500 text-white' :
-                    'bg-rose-500 text-white'
-                  }`}>
-                    {venue.safety}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
+<button className="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-lg font-bold transition-colors flex items-center justify-center gap-2">
+<Navigation className="w-5 h-5" />
+Navigate Now
+</button>
 
-  const EventsView = () => (
-    <div className="h-full overflow-y-auto pb-32">
-      <div className="px-6 pt-8">
-        <h1 className="text-5xl font-black text-gray-900 mb-2">Events</h1>
-        <p className="text-lg text-gray-600 mb-8">Happening in Dallas</p>
+<div className="mt-4 pt-4 border-t border-white/10 text-xs text-gray-500">
+{selectedVenue.civicZone} • {selectedVenue.hours}
+</div>
+</div>
+</div>
+</div>
+)}
+</div>
+```
 
-        <div className="space-y-4">
-          {liveEvents.map((event) => (
-            <div key={event.id} className="bg-white rounded-3xl p-5 shadow-lg border border-gray-100">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center text-4xl">
-                  {event.emoji}
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-black text-gray-900 text-lg mb-1">{event.name}</h3>
-                  <p className="text-sm text-gray-600 mb-2">{event.venue}</p>
-                  <div className="flex items-center gap-3 text-sm mb-3">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4 text-gray-500" />
-                      <span className="text-gray-700 font-medium">{event.time}</span>
-                    </div>
-                    <span className="text-purple-600 font-medium">{event.attendees}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="flex-1 bg-gray-50 rounded-lg p-2 text-center">
-                      <div className="text-sm font-bold text-gray-900">{event.crowd}%</div>
-                      <div className="text-xs text-gray-500">Expected</div>
-                    </div>
-                    <div className="flex-1 bg-gray-50 rounded-lg p-2 text-center">
-                      <div className="text-sm font-bold text-emerald-600">{event.safety}%</div>
-                      <div className="text-xs text-gray-500">Safety</div>
-                    </div>
-                    <button className="flex-1 bg-purple-500 text-white rounded-lg p-2 font-bold text-xs hover:bg-purple-600 transition-colors">
-                      I'm Going
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+);
 
-  const MapView = () => (
-    <div className="h-full relative">
-      <div className="absolute inset-0 bg-gray-900">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-        
-        {venues.map((venue, idx) => {
-          const colors = heatMode === 'safety' 
-            ? venue.safety >= 90 ? 'from-emerald-400 to-green-400' : venue.safety >= 80 ? 'from-amber-400 to-orange-400' : 'from-rose-400 to-red-400'
-            : venue.crowd < 60 ? 'from-cyan-400 to-blue-400' : venue.crowd < 80 ? 'from-purple-400 to-violet-400' : 'from-fuchsia-400 to-pink-400';
-          
-          return (
-            <button
-              key={venue.id}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${20 + idx * 12}%`, top: `${25 + (idx % 3) * 25}%` }}
-              onClick={() => setSelectedVenue(venue)}
-            >
-              <div className={`w-40 h-40 bg-gradient-to-br ${colors} rounded-full blur-[70px] opacity-50 animate-pulse`}></div>
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <div className="bg-black/70 backdrop-blur-xl rounded-xl px-3 py-2 border border-white/20 whitespace-nowrap">
-                  <div className="text-white font-bold text-sm">{venue.name}</div>
-                  <div className="text-cyan-400 text-xs">{heatMode === 'safety' ? `${venue.safety}%` : `${venue.crowd}%`}</div>
-                </div>
-              </div>
-            </button>
-          );
-        })}
+// ALERTS VIEW
+const AlertsView = () => (
+<div className="h-full overflow-y-auto pb-24 bg-black">
+<div className="px-6 pt-8">
+<h1 className="text-4xl font-bold text-white mb-2">Oak Cliff Status</h1>
+<p className="text-gray-400 mb-8">
+Real-time intelligence • Updated {currentTime.toLocaleTimeString([], { hour: ‘2-digit’, minute: ‘2-digit’ })}
+</p>
 
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <div className="w-6 h-6 bg-blue-500 rounded-full border-4 border-white shadow-lg"></div>
-          <div className="absolute inset-0 w-6 h-6 bg-blue-500 rounded-full animate-ping"></div>
-        </div>
-      </div>
+```
+{/* Overall status card */}
+<div className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-2xl p-6 mb-6 border border-emerald-500/20">
+<div className="flex items-start justify-between mb-4">
+<div>
+<div className="text-sm font-bold text-emerald-400 mb-2">OVERALL STATUS</div>
+<div className="text-5xl font-bold text-white mb-2">{oakCliffStatus.overall}</div>
+<div className="text-sm text-gray-400">Safety Score: {oakCliffStatus.safetyScore}/100</div>
+</div>
+<Shield className="w-16 h-16 text-emerald-400/50" />
+</div>
+<div className="flex items-center gap-2 text-sm text-emerald-400">
+<TrendingUp className="w-4 h-4" />
+<span className="font-semibold">{oakCliffStatus.trend}</span>
+</div>
+</div>
 
-      <div className="absolute top-6 left-6 right-6 z-30">
-        <div className="bg-black/70 backdrop-blur-2xl rounded-2xl p-4 border border-white/20">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setHeatMode('safety')}
-              className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${
-                heatMode === 'safety'
-                  ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white'
-                  : 'bg-white/10 text-white/60'
-              }`}
-            >
-              Safety
-            </button>
-            <button
-              onClick={() => setHeatMode('crowd')}
-              className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${
-                heatMode === 'crowd'
-                  ? 'bg-gradient-to-r from-purple-500 to-violet-500 text-white'
-                  : 'bg-white/10 text-white/60'
-              }`}
-            >
-              Crowd
-            </button>
-          </div>
-        </div>
-      </div>
+{/* Quick stats */}
+<div className="grid grid-cols-2 gap-4 mb-8">
+<div className="bg-white/5 rounded-xl p-4 border border-white/10">
+<div className="text-2xl font-bold text-white mb-1">{oakCliffStatus.activeIncidents}</div>
+<div className="text-sm text-gray-400">Active Incidents</div>
+</div>
+<div className="bg-white/5 rounded-xl p-4 border border-white/10">
+<div className="text-2xl font-bold text-amber-400 mb-1">{oakCliffStatus.trafficLevel}</div>
+<div className="text-sm text-gray-400">Traffic</div>
+</div>
+</div>
 
-      {selectedVenue && (
-        <div className="absolute bottom-6 left-6 right-6 z-30 animate-in slide-in-from-bottom-4">
-          <div className="bg-black/80 backdrop-blur-2xl rounded-3xl p-6 border border-white/20">
-            <div className="flex justify-between mb-4">
-              <div>
-                <h3 className="text-2xl font-black text-white">{selectedVenue.name}</h3>
-                <p className="text-gray-400">{selectedVenue.address}</p>
-              </div>
-              <button onClick={() => setSelectedVenue(null)} className="text-white/60 text-2xl">×</button>
-            </div>
-            <div className="flex gap-2 mb-4">
-              <button className="flex-1 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold py-4 rounded-xl">
-                <div className="flex items-center justify-center gap-2">
-                  <Navigation className="w-5 h-5" />
-                  Navigate
-                </div>
-              </button>
-              <button className="bg-white/20 backdrop-blur-xl text-white font-bold px-6 rounded-xl hover:bg-white/30">
-                <Share2 className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="text-xs text-gray-400 text-center">
-              {selectedVenue.checkins} people checked in today
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+{/* Active alerts */}
+<h2 className="text-xl font-bold text-white mb-4">Active Alerts</h2>
+<div className="space-y-3 mb-8">
+{oakCliffStatus.alerts.map((alert, idx) => (
+<div
+key={idx}
+className={`p-4 rounded-xl border ${
+alert.severity === 'high' ? 'bg-red-500/10 border-red-500/20' :
+alert.severity === 'medium' ? 'bg-amber-500/10 border-amber-500/20' :
+'bg-blue-500/10 border-blue-500/20'
+}`}
+>
+<div className="flex items-start gap-3">
+<AlertCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+alert.severity === 'high' ? 'text-red-400' :
+alert.severity === 'medium' ? 'text-amber-400' :
+'text-blue-400'
+}`} />
+<div className="flex-1">
+<div className={`text-sm font-bold mb-1 ${
+alert.severity === 'high' ? 'text-red-400' :
+alert.severity === 'medium' ? 'text-amber-400' :
+'text-blue-400'
+}`}>
+{alert.type.toUpperCase()}
+</div>
+<div className="text-sm text-gray-300">{alert.message}</div>
+</div>
+<div className="text-xs text-gray-500">LIVE</div>
+</div>
+</div>
+))}
+</div>
 
-  const SafetyView = () => (
-    <div className="h-full overflow-y-auto pb-32">
-      <div className="px-6 pt-8">
-        <h1 className="text-5xl font-black text-gray-900 mb-8">Safety</h1>
+{/* Venue status list */}
+<h2 className="text-xl font-bold text-white mb-4">Venue Status</h2>
+<div className="space-y-2">
+{venues.map((venue) => (
+<div key={venue.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
+<div className="flex items-center justify-between mb-2">
+<div className="font-semibold text-white">{venue.name}</div>
+<StatusBadge status={venue.status} />
+</div>
+<div className="flex items-center gap-4 text-xs text-gray-500">
+<span>{venue.crowd}% capacity</span>
+<span>•</span>
+<span>{venue.currentWait}</span>
+</div>
+</div>
+))}
+</div>
+</div>
+</div>
+```
 
-        <div className="relative mb-8">
-          <div className="absolute inset-0 bg-emerald-500/20 rounded-[3rem] blur-2xl"></div>
-          <div className="relative bg-gradient-to-br from-emerald-500 to-green-600 rounded-[3rem] p-8 text-center">
-            <div className="text-8xl font-black text-white mb-2">{safetyData.overall}</div>
-            <div className="text-2xl text-white/90 font-bold mb-4">Very Safe</div>
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-xl rounded-full px-4 py-2">
-              <TrendingUp className="w-4 h-4 text-white" />
-              <span className="text-white font-semibold">{safetyData.trend}% from yesterday</span>
-            </div>
-          </div>
-        </div>
+);
 
-        <h2 className="text-2xl font-black text-gray-900 mb-4">Live Alerts</h2>
-        <div className="space-y-3">
-          {safetyData.alerts.map((alert, idx) => (
-            <div key={idx} className="bg-white rounded-2xl p-4 shadow-lg border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${alert.level === 'high' ? 'bg-rose-500 animate-pulse' : 'bg-amber-500'}`}></div>
-                  <div>
-                    <div className="font-bold text-gray-900">{alert.type}</div>
-                    <div className="text-sm text-gray-600">{alert.location}</div>
-                  </div>
-                </div>
-                <div className="text-xs text-gray-500">{alert.time}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+return (
+<div className="h-screen bg-black flex flex-col">
+{/* Top bar */}
+{appState === ‘main’ && (
+<div className="absolute top-0 left-0 right-0 z-40 bg-gradient-to-b from-black via-black/80 to-transparent pt-6 pb-12 px-6">
+<div className="flex items-center justify-between">
+<div className="flex items-center gap-3">
+<MapPin className="w-6 h-6 text-red-500" />
+<div>
+<div className="text-xl font-bold text-white">KROWD</div>
+<div className="text-xs text-gray-500">Oak Cliff</div>
+</div>
+</div>
+<div className="flex items-center gap-3">
+<button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+<Search className="w-5 h-5 text-gray-400" />
+</button>
+<button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+<Bell className="w-5 h-5 text-gray-400" />
+</button>
+</div>
+</div>
+</div>
+)}
 
-  return (
-    <div className="h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col">
-      
-      {activeTab === 'foryou' && <ForYouView />}
-      {activeTab === 'discover' && <DiscoverView />}
-      {activeTab === 'events' && <EventsView />}
-      {activeTab === 'map' && <MapView />}
-      {activeTab === 'safety' && <SafetyView />}
+```
+{/* Main content */}
+{activeView === 'now' && <NowView />}
+{activeView === 'map' && <MapView />}
+{activeView === 'alerts' && <AlertsView />}
 
-      <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-2xl border-t border-gray-200 shadow-2xl">
-        <div className="px-2 py-3">
-          <div className="flex items-center justify-around">
-            {[
-              { id: 'foryou', icon: Sparkles, label: 'For You' },
-              { id: 'discover', icon: Eye, label: 'Discover' },
-              { id: 'map', icon: Navigation, label: 'Map' },
-              { id: 'events', icon: Calendar, label: 'Events' },
-              { id: 'safety', icon: Shield, label: 'Safety' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all ${
-                  activeTab === tab.id 
-                    ? 'bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 scale-110 shadow-lg' 
-                    : 'text-gray-400'
-                }`}
-              >
-                <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-white' : ''}`} />
-                <span className={`text-[10px] font-bold ${activeTab === tab.id ? 'text-white' : ''}`}>
-                  {tab.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+{/* Bottom navigation */}
+{appState === 'main' && (
+<div className="absolute bottom-0 left-0 right-0 bg-black/95 backdrop-blur-2xl border-t border-white/10">
+<div className="px-4 py-3">
+<div className="flex items-center justify-around">
+{[
+{ id: 'now', icon: Play, label: 'Now' },
+{ id: 'map', icon: MapPin, label: 'Map' },
+{ id: 'alerts', icon: AlertCircle, label: 'Alerts' }
+].map((tab) => (
+<button
+key={tab.id}
+onClick={() => setActiveView(tab.id)}
+className={`flex flex-col items-center gap-1 px-8 py-2 rounded-lg transition-all ${
+activeView === tab.id
+? 'text-white'
+: 'text-gray-500 hover:text-gray-300'
+}`}
+>
+<tab.icon
+className={`w-6 h-6 ${activeView === tab.id ? 'fill-red-500 text-red-500' : ''}`}
+strokeWidth={2}
+/>
+<span className="text-xs font-semibold">
+{tab.label}
+</span>
+</button>
+))}
+</div>
+</div>
+</div>
+)}
+</div>
+```
+
+);
 };
 
 export default App;
